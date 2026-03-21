@@ -1,0 +1,55 @@
+# ============================================================
+# Enterprise RAG Chatbot - Backend Requirements
+# Python 3.11+
+# ============================================================
+
+# --- Core Framework ---
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+
+# --- Request/Response Validation ---
+pydantic==2.7.1
+pydantic-settings==2.3.0
+
+# --- Authentication & Security ---
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.3
+
+# --- Email (OTP) ---
+aiosmtplib==3.0.1
+email-validator==2.1.1
+jinja2==3.1.4
+
+# --- RAG & AI Stack ---
+langchain>=0.2.5
+langchain-core>=0.2.10
+langchain-community>=0.2.5
+langchain-nvidia-ai-endpoints>=0.1.2
+langchain-huggingface>=0.0.3
+langchain-text-splitters>=0.2.2
+
+# --- Embeddings & Vector Store ---
+sentence-transformers==3.0.0
+faiss-cpu==1.8.0
+huggingface-hub==0.23.4
+
+# --- Document Parsing ---
+pypdf==4.2.0
+python-docx==1.1.2
+
+# --- Content Moderation ---
+better-profanity==0.7.0
+
+# --- Async HTTP ---
+httpx==0.27.0
+
+# --- CORS Middleware ---
+# included in fastapi/starlette
+
+# --- Rate Limiting ---
+slowapi==0.1.9
+
+# --- Logging ---
+loguru==0.7.2

@@ -1,0 +1,17 @@
+# ============================================================
+# Enterprise RAG Chatbot - Frontend Requirements
+# Python 3.11+
+# ============================================================
+
+# --- UI Framework ---
+streamlit==1.36.0
+
+# --- HTTP Client ---
+requests==2.32.3
+httpx==0.27.0
+
+# --- File Handling ---
+python-multipart==0.0.9
+
+# --- Utilities ---
+python-dotenv==1.0.1
