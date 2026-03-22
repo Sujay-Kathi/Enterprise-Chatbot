@@ -38,7 +38,7 @@ faiss_index/
 data/faiss_index/
 uploads/
 backend/uploads/
-.agent/
+.agent
 
 # IDE
 .vscode/
