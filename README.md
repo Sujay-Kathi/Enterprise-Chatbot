@@ -6,7 +6,6 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green?style=for-the-badge\&logo=fastapi)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red?style=for-the-badge\&logo=streamlit)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge\&logo=docker)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 ---
 
@@ -200,12 +199,6 @@ git push origin feature/AmazingFeature
 ```
 
 Then open a Pull Request 🚀
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License**
 
 ---
 
