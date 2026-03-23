@@ -381,8 +381,14 @@ def show_dashboard():
             name = "User" if role == "user" else "Velo"
             st.markdown(f"<div class='chat-name-label'>{name}</div>", unsafe_allow_html=True)
             st.markdown(content)
-            if role == "assistant" and msg.get("cached"):
-                st.caption("⚡ Serving from memory (Instant)")
+            
+            # Clean inline metadata tags
+            if role == "assistant":
+                if msg.get("cached"):
+                    st.markdown("<div style='font-size: 0.7rem; color: #FCD34D; background: rgba(252, 211, 77, 0.1); border: 1px solid rgba(252, 211, 77, 0.2); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 8px; margin-right: 6px;'>⚡ Instant Memory</div>", unsafe_allow_html=True)
+                if msg.get("sources") and len(msg["sources"]) > 0:
+                    sources_str = ", ".join(msg["sources"])
+                    st.markdown(f"<div style='font-size: 0.7rem; color: #9CA3AF; background: rgba(156, 163, 175, 0.1); border: 1px solid rgba(156, 163, 175, 0.2); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 8px;'>📚  {sources_str}</div>", unsafe_allow_html=True)
 
     if prompt := st.chat_input("Message the AI..."):
         # Display user message
@@ -422,18 +428,19 @@ def show_dashboard():
             st.write_stream(stream_parser())
 
             with metadata_container:
+                # Same inline metadata tags for the live stream
                 if meta_data.get("cached"):
-                    st.caption("⚡ Served from memory (Instant)")
+                    st.markdown("<div style='font-size: 0.7rem; color: #FCD34D; background: rgba(252, 211, 77, 0.1); border: 1px solid rgba(252, 211, 77, 0.2); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 8px; margin-right: 6px;'>⚡ Instant Memory</div>", unsafe_allow_html=True)
                 
-                # Sources are now easily searchable but hidden to focus on the name
-                if meta_data.get("sources"):
-                    with st.expander("📚 Sources Referenced", expanded=False):
-                        st.caption(f"Knowledge found in: {', '.join(meta_data['sources'])}")
+                if meta_data.get("sources") and len(meta_data["sources"]) > 0:
+                    sources_str = ", ".join(meta_data['sources'])
+                    st.markdown(f"<div style='font-size: 0.7rem; color: #9CA3AF; background: rgba(156, 163, 175, 0.1); border: 1px solid rgba(156, 163, 175, 0.2); padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 8px;'>📚  {sources_str}</div>", unsafe_allow_html=True)
 
             st.session_state.chat_history.append({
                 "role": "assistant", 
                 "content": full_response,
-                "cached": meta_data.get("cached", False)
+                "cached": meta_data.get("cached", False),
+                "sources": meta_data.get("sources", [])
             })
 
 # --- Main Logic ---
