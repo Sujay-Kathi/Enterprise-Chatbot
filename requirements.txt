@@ -1,8 +1,8 @@
 # ============================================================
 # Enterprise RAG Chatbot - Combined Requirements
-# Python 3.11+
+# REQUIRED: Python 3.11+
 # ============================================================
-
+python==3.11.9  
 # --- Core Frameworks ---
 fastapi==0.111.0
 uvicorn[standard]==0.30.1
