@@ -329,20 +329,23 @@ def show_dashboard():
     for msg in st.session_state.chat_history:
         role = msg["role"]
         content = msg["content"]
-        with st.chat_message(role):
+        label = "User" if role == "user" else "Velo"
+        avatar = "https://img.icons8.com/clouds/200/ffffff/user.png" if role == "user" else "https://img.icons8.com/clouds/200/ffffff/bot.png"
+        
+        with st.chat_message(label, avatar=avatar):
             st.markdown(content)
             if role == "assistant" and msg.get("cached"):
-                st.caption("⚡ Served from memory (0.01s)")
+                st.caption("⚡ Serving from memory (Instant)")
 
     # Input
     if prompt := st.chat_input("Message the AI..."):
         # Display user message
         st.session_state.chat_history.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
+        with st.chat_message("User"):
             st.markdown(prompt)
 
         # API Call (Streaming)
-        with st.chat_message("assistant"):
+        with st.chat_message("Velo"):
             response_container = st.container()
             metadata_container = st.container()
             
@@ -372,9 +375,12 @@ def show_dashboard():
 
             with metadata_container:
                 if meta_data.get("cached"):
-                    st.caption("⚡ Served from memory (0.01s)")
+                    st.caption("⚡ Served from memory (Instant)")
+                
+                # Sources are now easily searchable but hidden to focus on the name
                 if meta_data.get("sources"):
-                    st.caption(f"Sources used: {', '.join(meta_data['sources'])}")
+                    with st.expander("📚 Sources Referenced", expanded=False):
+                        st.caption(f"Knowledge found in: {', '.join(meta_data['sources'])}")
 
             st.session_state.chat_history.append({
                 "role": "assistant", 
