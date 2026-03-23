@@ -173,8 +173,7 @@ def answer_query(
     answer = response.content.strip()
 
     # 5. Save to Response Cache
-    if not history:
-        response_cache_service.save_cache(query, answer, emotion, sources)
+    response_cache_service.save_cache(query, answer, emotion, sources)
 
     logger.success(f"[RAG] Answer generated ({len(answer)} chars)")
     return {"answer": answer, "emotion": emotion, "sources": sources}
@@ -266,8 +265,7 @@ def stream_answer_query(
             yield chunk.content
             
     # Save to Cache
-    if not history:
-        response_cache_service.save_cache(query, full_answer.strip(), emotion, sources)
+    response_cache_service.save_cache(query, full_answer.strip(), emotion, sources)
 
 
 def summarize_document(file_bytes: bytes, filename: str) -> str:

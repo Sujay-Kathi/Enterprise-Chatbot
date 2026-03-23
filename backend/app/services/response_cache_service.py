@@ -17,48 +17,57 @@ _response_store: Optional[FAISS] = None
 def _get_store() -> Optional[FAISS]:
     """Load the response cache index from disk."""
     global _response_store
-    path = Path(settings.response_cache_path)
-    if _response_store is None and path.exists() and any(path.iterdir()):
-        try:
-            _response_store = FAISS.load_local(
-                str(path),
-                get_embeddings(),
-                allow_dangerous_deserialization=True
-            )
-        except Exception as e:
-            logger.warning(f"Failed to load response cache: {e}")
+    path = Path(settings.response_cache_path).absolute()
+    
+    if _response_store is None:
+        if path.exists():
+            files = list(path.iterdir())
+            if files:
+                try:
+                    logger.info(f"[SemanticCache] Loading index from {path}")
+                    _response_store = FAISS.load_local(
+                        str(path),
+                        get_embeddings(),
+                        allow_dangerous_deserialization=True
+                    )
+                except Exception as e:
+                    logger.warning(f"[SemanticCache] Load fail: {e}")
+            else:
+                logger.debug(f"[SemanticCache] Empty index dir: {path}")
+        else:
+            logger.debug(f"[SemanticCache] Index path not found: {path}")
+            
     return _response_store
 
-def check_cache(query: str, threshold: float = 0.5) -> Optional[Dict]:
+def check_cache(query: str) -> Optional[Dict]:
     """Semantic lookup for a query in the response cache."""
+    logger.info(f"[SemanticCache] Checking query: '{query}'")
     store = _get_store()
     if store is None:
-        logger.debug("[SemanticCache] Index not initialized yet.")
+        logger.warning("[SemanticCache] MISS: Store not available.")
         return None
     
     try:
         results = store.similarity_search_with_score(query, k=1)
         if not results:
-            logger.debug(f"[SemanticCache] MISS: No results for '{query}'")
+            logger.info(f"[SemanticCache] MISS: Index is empty (k=1 returned nothing).")
             return None
             
         doc, score = results[0]
-        # FAISS L2 distance: 0 is identical. 
-        # For all-MiniLM-L6-v2, score < 0.2 is essentially the same intent.
-        # score < 0.6 is still quite similar.
-        # We will use 0.25 as our conservative "Identical" threshold.
-        if score < 0.3: 
-            logger.success(f"[SemanticCache] HIT for '{query}' (score={score:.4f})")
+        # FAISS L2 distance: Lower is closer.
+        # Threshold: 0.3 for very similar.
+        if score < 0.4: 
+            logger.success(f"[SemanticCache] HIT! (score={score:.4f})")
             return {
-                "answer": doc.page_content,
+                "answer": doc.metadata.get("answer"),
                 "emotion": doc.metadata.get("emotion"),
                 "sources": doc.metadata.get("sources", []),
                 "cached": True
             }
         else:
-            logger.info(f"[SemanticCache] MISS: Closest match score too high ({score:.4f}) for '{query}'")
+            logger.info(f"[SemanticCache] MISS: Score too high ({score:.4f})")
     except Exception as e:
-        logger.error(f"Error checking cache: {e}")
+        logger.error(f"[SemanticCache] Search Error: {e}")
         
     return None
 
@@ -68,15 +77,15 @@ def save_cache(query: str, answer: str, emotion: str, sources: List[str]):
     
     embeddings = get_embeddings()
     doc = Document(
-        page_content=answer,
+        page_content=query, # Vectorized part (must be the question)
         metadata={
-            "query": query,
+            "answer": answer, # Stored part
             "emotion": emotion,
             "sources": sources
         }
     )
     
-    path = Path(settings.response_cache_path)
+    path = Path(settings.response_cache_path).absolute()
     path.mkdir(parents=True, exist_ok=True)
     
     if _response_store is None:
