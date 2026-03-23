@@ -29,34 +29,34 @@ def _get_store() -> Optional[FAISS]:
             logger.warning(f"Failed to load response cache: {e}")
     return _response_store
 
-def check_cache(query: str, threshold: float = 0.98) -> Optional[Dict]:
+def check_cache(query: str, threshold: float = 0.5) -> Optional[Dict]:
     """Semantic lookup for a query in the response cache."""
     store = _get_store()
     if store is None:
+        logger.debug("[SemanticCache] Index not initialized yet.")
         return None
     
-    # Exact Match First (Simple check)
-    # We could use a simple dict, but FAISS is fast enough.
-    
-    # Similarity Search with Score (Lower score is better in L2 distance)
-    # Langchain FAISS similarity_search_with_relevance_scores or similar
     try:
         results = store.similarity_search_with_score(query, k=1)
         if not results:
+            logger.debug(f"[SemanticCache] MISS: No results for '{query}'")
             return None
             
         doc, score = results[0]
-        # For FAISS L2 distance, 0 is perfect match.
-        # Conversion to cos-sim or similar is tricky, but 
-        # score < 0.05 is usually extremely similar (95%+).
-        if score < 0.03: # High similarity threshold for near-identity
-            logger.info(f"[SemanticCache] HIT for '{query}' (score={score:.4f})")
+        # FAISS L2 distance: 0 is identical. 
+        # For all-MiniLM-L6-v2, score < 0.2 is essentially the same intent.
+        # score < 0.6 is still quite similar.
+        # We will use 0.25 as our conservative "Identical" threshold.
+        if score < 0.3: 
+            logger.success(f"[SemanticCache] HIT for '{query}' (score={score:.4f})")
             return {
                 "answer": doc.page_content,
                 "emotion": doc.metadata.get("emotion"),
                 "sources": doc.metadata.get("sources", []),
                 "cached": True
             }
+        else:
+            logger.info(f"[SemanticCache] MISS: Closest match score too high ({score:.4f}) for '{query}'")
     except Exception as e:
         logger.error(f"Error checking cache: {e}")
         

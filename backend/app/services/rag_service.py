@@ -110,10 +110,9 @@ def answer_query(
     logger.info(f"[RAG] Detected emotion: {emotion}")
 
     # 0. Check Response Cache (Semantic)
-    if not history: # Only cache the first turn for now to avoid state issues
-        cached = response_cache_service.check_cache(query)
-        if cached:
-            return cached
+    cached = response_cache_service.check_cache(query)
+    if cached:
+        return cached
 
     # Retrieval
     vector_store = get_vector_store()
@@ -196,13 +195,12 @@ def stream_answer_query(
     logger.info(f"[RAG-Stream] Detected emotion: {emotion}")
 
     # 0. Check Response Cache
-    if not history:
-        cached = response_cache_service.check_cache(query)
-        if cached:
-            import json
-            yield f"__METADATA__:{json.dumps({'emotion': cached['emotion'], 'sources': cached['sources'], 'cached': True})}\n"
-            yield cached['answer']
-            return
+    cached = response_cache_service.check_cache(query)
+    if cached:
+        import json
+        yield f"__METADATA__:{json.dumps({'emotion': cached['emotion'], 'sources': cached['sources'], 'cached': True})}\n"
+        yield cached['answer']
+        return
 
     # Retrieval
     vector_store = get_vector_store()
