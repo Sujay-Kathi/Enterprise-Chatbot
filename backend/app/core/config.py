@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     # Hybrid RAG+CAG
     raw_docs_path: str = "./data/raw_documents"
     cache_registry_path: str = "./data/cache_registry.json"
+    response_cache_path: str = "./data/response_cache"
 
     @property
     def cors_origins_list(self) -> list[str]:

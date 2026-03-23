@@ -11,6 +11,7 @@ from pypdf import PdfReader
 from loguru import logger
 
 from app.core.config import get_settings
+from app.services import response_cache_service
 
 settings = get_settings()
 
@@ -108,5 +109,8 @@ def ingest_document(file_bytes: bytes, filename: str) -> int:
 
     _vector_store.save_local(index_path)
     logger.success(f"FAISS index saved. Total chunks this session: {len(chunks)}")
+
+    # 5. Invalidate Response Cache (Knowledge changed)
+    response_cache_service.clear_cache()
 
     return len(chunks)

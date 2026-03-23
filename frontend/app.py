@@ -331,6 +331,8 @@ def show_dashboard():
         content = msg["content"]
         with st.chat_message(role):
             st.markdown(content)
+            if role == "assistant" and msg.get("cached"):
+                st.caption("⚡ Served from memory (0.01s)")
 
     # Input
     if prompt := st.chat_input("Message the AI..."):
@@ -369,10 +371,16 @@ def show_dashboard():
             st.write_stream(stream_parser())
 
             with metadata_container:
-                if meta_data["sources"]:
+                if meta_data.get("cached"):
+                    st.caption("⚡ Served from memory (0.01s)")
+                if meta_data.get("sources"):
                     st.caption(f"Sources used: {', '.join(meta_data['sources'])}")
 
-            st.session_state.chat_history.append({"role": "assistant", "content": full_response})
+            st.session_state.chat_history.append({
+                "role": "assistant", 
+                "content": full_response,
+                "cached": meta_data.get("cached", False)
+            })
 
 # --- Main Logic ---
 if st.session_state.token is None:

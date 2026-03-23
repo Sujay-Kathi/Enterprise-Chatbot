@@ -9,7 +9,7 @@ from loguru import logger
 
 from app.core.config import get_settings
 from app.services.ingestion_service import get_vector_store
-from app.services import cache_service
+from app.services import cache_service, response_cache_service
 
 settings = get_settings()
 
@@ -109,6 +109,12 @@ def answer_query(
     tone_instruction = _TONE_INSTRUCTIONS[emotion]
     logger.info(f"[RAG] Detected emotion: {emotion}")
 
+    # 0. Check Response Cache (Semantic)
+    if not history: # Only cache the first turn for now to avoid state issues
+        cached = response_cache_service.check_cache(query)
+        if cached:
+            return cached
+
     # Retrieval
     vector_store = get_vector_store()
     context_text = ""
@@ -167,6 +173,10 @@ def answer_query(
     response = llm.invoke(messages)
     answer = response.content.strip()
 
+    # 5. Save to Response Cache
+    if not history:
+        response_cache_service.save_cache(query, answer, emotion, sources)
+
     logger.success(f"[RAG] Answer generated ({len(answer)} chars)")
     return {"answer": answer, "emotion": emotion, "sources": sources}
 
@@ -184,6 +194,15 @@ def stream_answer_query(
     emotion = detect_emotion(query)
     tone_instruction = _TONE_INSTRUCTIONS[emotion]
     logger.info(f"[RAG-Stream] Detected emotion: {emotion}")
+
+    # 0. Check Response Cache
+    if not history:
+        cached = response_cache_service.check_cache(query)
+        if cached:
+            import json
+            yield f"__METADATA__:{json.dumps({'emotion': cached['emotion'], 'sources': cached['sources'], 'cached': True})}\n"
+            yield cached['answer']
+            return
 
     # Retrieval
     vector_store = get_vector_store()
@@ -242,9 +261,15 @@ def stream_answer_query(
 
     # Streaming LLM call
     llm = _build_llm()
+    full_answer = ""
     for chunk in llm.stream(messages):
         if chunk.content:
+            full_answer += chunk.content
             yield chunk.content
+            
+    # Save to Cache
+    if not history:
+        response_cache_service.save_cache(query, full_answer.strip(), emotion, sources)
 
 
 def summarize_document(file_bytes: bytes, filename: str) -> str:
