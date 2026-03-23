@@ -1,3 +1,14 @@
 {
-  "test_doc": true
+  "test_doc": {
+    "pinned": true,
+    "usage_count": 3,
+    "last_accessed": 1774288284.5159314,
+    "auto_pinned": true
+  },
+  "cold_doc": {
+    "pinned": true,
+    "usage_count": 1,
+    "last_accessed": 1774288284.527449,
+    "auto_pinned": true
+  }
 }

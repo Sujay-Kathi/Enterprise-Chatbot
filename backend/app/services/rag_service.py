@@ -132,6 +132,8 @@ def answer_query(
                 source = doc.metadata.get("source", "Unknown")
                 if source not in sources and source not in _HIDDEN_SOURCES:
                     sources.append(source)
+                    # Notify CAG Heat Map
+                    cache_service.record_access(source)
                 context_parts.append(f"[Source: {source}]\n{doc.page_content}")
             context_text = "\n\n---\n\n".join(context_parts)
         else:
@@ -205,6 +207,8 @@ def stream_answer_query(
                 source = doc.metadata.get("source", "Unknown")
                 if source not in sources and source not in _HIDDEN_SOURCES:
                     sources.append(source)
+                    # Notify CAG Heat Map
+                    cache_service.record_access(source)
                 context_parts.append(f"[Source: {source}]\n{doc.page_content}")
             context_text = "\n\n---\n\n".join(context_parts)
         else:

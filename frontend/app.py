@@ -298,9 +298,13 @@ def show_dashboard():
             for doc in docs:
                 fname = doc["filename"]
                 is_pinned = doc["pinned"]
+                count = doc.get("usage_count", 0)
                 
-                # Manual toggle logic in sidebar
-                label = f"📌 {fname}" if is_pinned else f"📄 {fname}"
+                # Dynamic labeling
+                icon = "🔥" if is_pinned else "📄"
+                label = f"{icon} {fname} ({count} hits)"
+                
+                # Checkbox for manual override / status view
                 if st.checkbox(label, value=is_pinned, key=f"pin_{fname}"):
                     if not is_pinned:
                         if api_pin_document(fname, True, st.session_state.token):
