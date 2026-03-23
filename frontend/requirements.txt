@@ -5,13 +5,12 @@
 
 # --- UI Framework ---
 streamlit==1.36.0
+streamlit-cookies-controller==0.0.2
 
 # --- HTTP Client ---
 requests==2.32.3
 httpx==0.27.0
 
-# --- File Handling ---
-python-multipart==0.0.9
-
 # --- Utilities ---
+loguru==0.7.2
 python-dotenv==1.0.1
