@@ -5,7 +5,7 @@ from loguru import logger
 from typing import List
 
 from app.core import dependencies
-from app.services import ingestion_service
+from app.services import ingestion_service, cache_service
 
 router = APIRouter(prefix="/documents", tags=["Document Ingestion"])
 
@@ -57,5 +57,20 @@ def get_index_status(current_user: str = Depends(dependencies.get_current_user))
     if store is None:
         return {"status": "empty", "message": "No documents indexed yet."}
     
-    # FAISS-CPU doesn't easily expose 'total docs', but we can check if it exists
     return {"status": "ready", "message": "Vector store is active and contains document chunks."}
+
+@router.get("/", status_code=status.HTTP_200_OK)
+def list_documents(current_user: str = Depends(dependencies.get_current_user)):
+    """List all documents with their pinned cache status."""
+    docs = cache_service.get_document_status()
+    return {"documents": docs}
+
+@router.post("/pin", status_code=status.HTTP_200_OK)
+def pin_document(
+    filename: str, 
+    pin: bool = True,
+    current_user: str = Depends(dependencies.get_current_user)
+):
+    """Toggle pinning a document to the Hot Context Window (CAG)."""
+    cache_service.pin_document(filename, pin)
+    return {"message": f"Document '{filename}' pinning set to {pin}"}

@@ -9,6 +9,7 @@ from loguru import logger
 
 from app.core.config import get_settings
 from app.services.ingestion_service import get_vector_store
+from app.services import cache_service
 
 settings = get_settings()
 
@@ -66,16 +67,19 @@ Your primary purpose is to help employees find information from company document
 TONE INSTRUCTION:
 {tone_instruction}
 
-CONTEXT FROM DOCUMENTS:
+PINNED HIGH-PRIORITY CONTEXT (CAG):
+{pinned_context}
+
+RETRIEVED DOCUMENT SNIPPETS (RAG):
 {context}
 
 RULES:
-- If there is relevant information in the CONTEXT FROM DOCUMENTS, prioritize it for your answer.
+- If there is relevant information in PINNED HIGH-PRIORITY CONTEXT, treat it as the "Golden Truth".
+- Use the RETRIEVED SNIPPETS to supplement specific figures or details not in the pinned context.
 - Weave source citations naturally into your response if needed.
-- If the user is just saying hello, asking general questions, or if documents haven't been uploaded yet, respond naturally, warmly, and in a human way to assist them.
-- If the user asks for specific company information that is NOT in the context, politely inform them that you do not have documents covering that topic yet.
-- Do NOT fabricate company policies or information.
-- Keep answers concise but complete.
+- If the user is just saying hello, asking general questions, or if documents haven't been uploaded yet, respond naturally.
+- If the user asks for specific company information that is NOT in the context, politely inform them.
+- Do NOT fabricate information. Keep answers concise but complete.
 """
 
 
@@ -133,9 +137,13 @@ def answer_query(
         else:
             context_text = "No relevant sections found in the uploaded documents."
 
+    # PINNED CONTEXT (CAG)
+    pinned_context = cache_service.get_pinned_context()
+
     # Build messages
     system_content = _SYSTEM_PROMPT.format(
         tone_instruction=tone_instruction,
+        pinned_context=pinned_context if pinned_context else "No high-priority documents pinned.",
         context=context_text,
     )
     messages = [SystemMessage(content=system_content)]
@@ -202,14 +210,17 @@ def stream_answer_query(
         else:
             context_text = "No relevant sections found in the uploaded documents."
 
-    # First yield: Metadata in a special format
-    # We use a custom separator or JSON per line
+    # First yield: Metadata
     import json
     yield f"__METADATA__:{json.dumps({'emotion': emotion, 'sources': sources})}\n"
+
+    # PINNED CONTEXT (CAG)
+    pinned_context = cache_service.get_pinned_context()
 
     # Build messages
     system_content = _SYSTEM_PROMPT.format(
         tone_instruction=tone_instruction,
+        pinned_context=pinned_context if pinned_context else "No high-priority documents pinned.",
         context=context_text,
     )
     messages = [SystemMessage(content=system_content)]

@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     faiss_index_path: str = "./data/faiss_index"
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 
+    # Hybrid RAG+CAG
+    raw_docs_path: str = "./data/raw_documents"
+    cache_registry_path: str = "./data/cache_registry.json"
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]

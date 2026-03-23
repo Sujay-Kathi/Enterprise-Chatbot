@@ -89,6 +89,13 @@ def ingest_document(file_bytes: bytes, filename: str) -> int:
     )
     logger.info(f"Split into {len(chunks)} chunks.")
 
+    # 2.5 Save raw text for CAG (Hybrid RAG+CAG)
+    raw_docs_dir = Path(settings.raw_docs_path)
+    raw_docs_dir.mkdir(parents=True, exist_ok=True)
+    with open(raw_docs_dir / f"{filename}.txt", "w", encoding="utf-8") as f:
+        f.write(raw_text)
+    logger.info(f"Saved raw text copy to {raw_docs_dir / f'{filename}.txt'}")
+
     # 3 & 4. Embed + Index
     embeddings = _get_embeddings()
     index_path = settings.faiss_index_path

@@ -186,6 +186,26 @@ def api_chat_stream(query: str, history: List[Dict], token: str):
         logger.error(f"Streaming request failed: {e}")
         yield f"❌ Error: {str(e)}"
 
+def api_list_documents(token: str) -> List[Dict]:
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        resp = requests.get(f"{BACKEND_URL}/documents/", headers=headers)
+        if resp.status_code == 200:
+            return resp.json().get("documents", [])
+    except Exception as e:
+        logger.error(f"List documents failed: {e}")
+    return []
+
+def api_pin_document(filename: str, pin: bool, token: str) -> bool:
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {"filename": filename, "pin": pin}
+    try:
+        resp = requests.post(f"{BACKEND_URL}/documents/pin", headers=headers, params=params)
+        return resp.status_code == 200
+    except Exception as e:
+        logger.error(f"Pin document failed: {e}")
+        return False
+
 # --- ── View: Login ─────────────────────────────────────────────────────────
 
 def show_login():
@@ -261,8 +281,37 @@ def show_dashboard():
                 with st.spinner("Embedding..."):
                     if api_upload_file(uploaded_file, st.session_state.token):
                         st.success("Indexed successfully.")
+                        st.rerun()
                     else:
                         st.error("Failed to index.")
+        
+        st.divider()
+        st.markdown("**🧠 Knowledge Manager (CAG)**")
+        docs = api_list_documents(st.session_state.token)
+        if docs:
+            # Stats
+            total_docs = len(docs)
+            pinned_docs = sum(1 for d in docs if d["pinned"])
+            st.caption(f"Files Index: {total_docs} | 🔥 Pinned: {pinned_docs}")
+            
+            # Use small columns or container for clean list
+            for doc in docs:
+                fname = doc["filename"]
+                is_pinned = doc["pinned"]
+                
+                # Manual toggle logic in sidebar
+                label = f"📌 {fname}" if is_pinned else f"📄 {fname}"
+                if st.checkbox(label, value=is_pinned, key=f"pin_{fname}"):
+                    if not is_pinned:
+                        if api_pin_document(fname, True, st.session_state.token):
+                            st.rerun()
+                else:
+                    if is_pinned:
+                        if api_pin_document(fname, False, st.session_state.token):
+                            st.rerun()
+        else:
+            st.caption("No documents in library yet.")
+            
         st.divider()
         st.caption("Powered by NVIDIA NIM")
 
