@@ -80,62 +80,106 @@ st.markdown("""
         background-color: #171717 !important;
         border-right: none !important;
     }
-    h1, h2, h3, h4, .stMarkdown { color: #f9f9f9 !important; }
-    p { color: #d1d5db !important; }
+    /* --- UI & Typography Polish --- */
+    h1, h2, h3, h4 { 
+        color: #F3F4F6 !important; 
+        font-weight: 600 !important;
+        letter-spacing: -0.02em;
+    }
+    .stMarkdown, p { 
+        color: #E5E7EB !important; 
+        line-height: 1.6;
+    }
     
-    /* Flat Buttons */
+    /* Clean, Modern Buttons (Remove Cliché Defaults) */
     .stButton>button { 
-        width: 100%; border-radius: 8px; height: 3em; font-weight: 500; 
-        background-color: #ffffff;
-        color: #000000; border: none; box-shadow: none;
-        transition: background-color 0.2s;
+        width: 100%; 
+        border-radius: 8px; 
+        height: 3rem; 
+        font-weight: 500; 
+        background-color: #3B82F6; /* Velo Blue */
+        color: #FFFFFF !important; 
+        border: none; 
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .stButton>button:hover {
-        background-color: #e5e5e5;
-        color: #000000;
-        transform: none;
+        background-color: #2563EB;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.2);
     }
     
-    /* Standard Input */
+    /* Inputs: Solid & Professional */
     .stTextInput>div>div>input {
-        background-color: #212121;
-        border: 1px solid #4a4a4a;
-        color: white; border-radius: 8px;
+        background-color: #27272A;
+        border: 1px solid #3F3F46;
+        color: #F8FAFC; 
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.2s;
+    }
+    .stTextInput>div>div>input:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 1px #3B82F6;
     }
     
-    /* Tabs */
-    div[data-baseweb="tab-list"] { background: transparent; }
-    div[data-baseweb="tab"] { color: #a3a3a3; font-weight: 500; }
-    div[aria-selected="true"] { color: #ffffff !important; background: transparent; border-bottom: 2px solid #ffffff; }
+    /* Tabs: Simplified */
+    div[data-baseweb="tab-list"] { background: transparent; gap: 1rem; }
+    div[data-baseweb="tab"] { color: #A1A1AA; font-weight: 500; font-size: 0.95rem; }
+    div[aria-selected="true"] { color: #FFFFFF !important; background: transparent; border-bottom: 2px solid #3B82F6 !important; }
 
-    /* --- Chat UI Overhaul (ChatGPT Style) --- */
+    /* --- Chat UI Overhaul (Minimalist, Distinct) --- */
     div[data-testid="stBottomBlockContainer"] {
         background: #212121 !important;
-        padding-bottom: 20px !important;
+        padding-bottom: 24px !important;
     }
+    /* Elegant Chat Input */
     div[data-testid="stChatInput"] {
-        background-color: #2f2f2f !important;
-        border: none !important;
-        border-radius: 24px !important;
-        box-shadow: none !important;
-        padding: 4px 10px !important;
+        background-color: #27272A !important;
+        border: 1px solid #3F3F46 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        padding: 4px 12px !important;
     }
     
-    /* AI Chat Frame (Transparent) */
+    /* AI Chat Frame (Transparent, Clean) */
     div[data-testid="stChatMessage"] {
         background-color: transparent !important;
         border: none !important;
-        box-shadow: none !important;
-        padding: 0.5rem 0 !important;
+        padding: 1rem 0 !important;
+        gap: 1rem !important;
     }
     
-    /* User Chat Bubble */
+    /* User Chat Bubble (Distinct Visual Hierarchy) */
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        background-color: #2f2f2f !important;
-        border-radius: 20px !important;
-        padding: 1rem 1.5rem !important;
-        margin: 1rem 0 !important;
+        background-color: #27272A !important;
+        border: 1px solid #3F3F46 !important;
+        border-radius: 12px !important;
+        padding: 1.25rem !important;
+        margin: 1rem 0 2rem 0 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
     }
+
+    /* Small labels above chat */
+    .stCaptionContainer p {
+        color: #9CA3AF !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    /* Custom Avatar styling to override ugly default boxes */
+    [data-testid="chatAvatarIcon-user"] {
+        background-color: #3B82F6 !important;
+        border-radius: 8px !important;
+    }
+    [data-testid="chatAvatarIcon-assistant"] {
+        background-color: #10B981 !important;
+        border-radius: 8px !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
