@@ -61,8 +61,11 @@ def detect_emotion(query: str) -> str:
 # ── System Prompt Template ────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT = """\
-You are an intelligent, empathetic Enterprise AI Assistant for internal company use.
-Your primary purpose is to help employees find information from company documents, but you can also hold polite conversation.
+You are **Velo**, the high-speed enterprise knowledge expert.
+
+INTRODUCTION RULE:
+If the user is saying hello or starting a new conversation, you MUST start your response by saying: "Hello! I'm Velo, your high-speed knowledge expert..." or a very close variations of it.
+For all other queries, be direct, professional, and extremely fast.
 
 TONE INSTRUCTION:
 {tone_instruction}
@@ -210,7 +213,7 @@ def stream_answer_query(
         context_text = "No documents have been uploaded yet."
     else:
         # Skip retrieval for casual greetings
-        casual_greetings = ["hi", "hello", "hey", "who are you?", "who are you", "how are you?", "how are you", "thanks", "thank you", "roshni?", "roshni"]
+        casual_greetings = ["hi", "hello", "hey", "who are you?", "who are you", "how are you?", "how are you", "thanks", "thank you", "velo?", "velo"]
         if query.strip().lower() in casual_greetings:
             docs = []
             context_text = "No context needed for this greeting."

@@ -10,8 +10,8 @@ from streamlit_cookies_controller import CookieController
 
 # --- Page Config ---
 st.set_page_config(
-    page_title="Enterprise AI Assistant",
-    page_icon="✨",
+    page_title="Velo AI | Enterprise Chatbot",
+    page_icon="⚡",
     layout="centered",
     initial_sidebar_state="expanded",
 )
@@ -209,7 +209,7 @@ def api_pin_document(filename: str, pin: bool, token: str) -> bool:
 # --- ── View: Login ─────────────────────────────────────────────────────────
 
 def show_login():
-    st.subheader("🏢 Enterprise RAG Chatbot")
+    st.subheader("🏢 Velo Enterprise")
     st.title("User Login")
     st.info("Enter your corporate email to receive a secure 6-digit access code (OTP).")
     
@@ -264,7 +264,7 @@ def show_dashboard():
     # Sidebar: User Info & Logout
     with st.sidebar:
         st.image("https://img.icons8.com/clouds/200/ffffff/bot.png")
-        st.title("AI Assistant")
+        st.title("VELO")
         st.markdown(f"Logged in as:<br>`{st.session_state.email}`", unsafe_allow_html=True)
         st.write("")
         if st.button("🔓 Sign Out"):
