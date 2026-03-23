@@ -158,7 +158,16 @@ docker-compose up --build
 
 ---
 
-## 🧪 How to Use
+### ☁️ Option C: Cloud Deployment
+
+1.  **Frontend**: Deploy the `frontend/` folder to **Streamlit Cloud**.
+2.  **Backend**: Deploy the root directory to **Railway** or **Render**.
+    - The `Procfile` and `runtime.txt` are already included for convenience.
+3.  **Environment Variables**:
+    - Set `BACKEND_URL` in Streamlit Cloud to your deployed backend URL.
+    - Set all `.env` variables in your backend hosting provider.
+
+---
 
 1. Open → `http://localhost:8501`
 2. Login using Email OTP
