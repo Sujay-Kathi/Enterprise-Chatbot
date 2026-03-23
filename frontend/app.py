@@ -160,24 +160,26 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
     }
 
-    /* Small labels above chat */
-    .stCaptionContainer p {
-        color: #9CA3AF !important;
-        font-size: 0.8rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-weight: 600;
-        margin-bottom: 4px;
-    }
-    
     /* Custom Avatar styling to override ugly default boxes */
     [data-testid="chatAvatarIcon-user"] {
         background-color: #3B82F6 !important;
         border-radius: 8px !important;
+        color: white !important;
     }
     [data-testid="chatAvatarIcon-assistant"] {
         background-color: #10B981 !important;
         border-radius: 8px !important;
+        color: white !important;
+    }
+    
+    /* Small labels above chat */
+    .chat-name-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #9CA3AF;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
 </style>
@@ -373,23 +375,25 @@ def show_dashboard():
     for msg in st.session_state.chat_history:
         role = msg["role"]
         content = msg["content"]
-        label = "User" if role == "user" else "Velo"
-        avatar = "https://img.icons8.com/clouds/200/ffffff/user.png" if role == "user" else "https://img.icons8.com/clouds/200/ffffff/bot.png"
+        avatar = "👤" if role == "user" else "⚡"
         
-        with st.chat_message(label, avatar=avatar):
+        with st.chat_message(role, avatar=avatar):
+            name = "User" if role == "user" else "Velo"
+            st.markdown(f"<div class='chat-name-label'>{name}</div>", unsafe_allow_html=True)
             st.markdown(content)
             if role == "assistant" and msg.get("cached"):
                 st.caption("⚡ Serving from memory (Instant)")
 
-    # Input
     if prompt := st.chat_input("Message the AI..."):
         # Display user message
         st.session_state.chat_history.append({"role": "user", "content": prompt})
-        with st.chat_message("User"):
+        with st.chat_message("user", avatar="👤"):
+            st.markdown("<div class='chat-name-label'>User</div>", unsafe_allow_html=True)
             st.markdown(prompt)
 
         # API Call (Streaming)
-        with st.chat_message("Velo"):
+        with st.chat_message("assistant", avatar="⚡"):
+            st.markdown("<div class='chat-name-label'>Velo</div>", unsafe_allow_html=True)
             response_container = st.container()
             metadata_container = st.container()
             
