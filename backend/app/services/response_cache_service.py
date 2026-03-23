@@ -8,7 +8,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
 from app.core.config import get_settings
-from app.services.ingestion_service import _get_embeddings
+from app.core.embeddings import get_embeddings
 
 settings = get_settings()
 
@@ -22,7 +22,7 @@ def _get_store() -> Optional[FAISS]:
         try:
             _response_store = FAISS.load_local(
                 str(path),
-                _get_embeddings(),
+                get_embeddings(),
                 allow_dangerous_deserialization=True
             )
         except Exception as e:
@@ -66,7 +66,7 @@ def save_cache(query: str, answer: str, emotion: str, sources: List[str]):
     """Save a question/answer pair to the semantic cache."""
     global _response_store
     
-    embeddings = _get_embeddings()
+    embeddings = get_embeddings()
     doc = Document(
         page_content=answer,
         metadata={

@@ -8,7 +8,7 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from loguru import logger
 
 from app.core.config import get_settings
-from app.services.ingestion_service import get_vector_store
+from app.core.embeddings import get_vector_store
 from app.services import cache_service, response_cache_service
 
 settings = get_settings()
@@ -278,6 +278,7 @@ def summarize_document(file_bytes: bytes, filename: str) -> str:
     Uses a map-reduce style: summarize chunks, then combine.
     """
     from langchain_text_splitters import RecursiveCharacterTextSplitter
+    from app.core.embeddings import get_embeddings
     from app.services.ingestion_service import _extract_text
 
     raw_text = _extract_text(file_bytes, filename)

@@ -4,46 +4,20 @@ import os
 from pathlib import Path
 from typing import Optional
 
+from loguru import logger
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
-from loguru import logger
 
 from app.core.config import get_settings
+from app.core.embeddings import get_embeddings, get_vector_store, set_vector_store
 from app.services import response_cache_service
 
 settings = get_settings()
 
 # Singleton embeddings model (loaded once, reused for all requests)
-_embeddings: Optional[HuggingFaceEmbeddings] = None
-_vector_store: Optional[FAISS] = None
-
-
-def _get_embeddings() -> HuggingFaceEmbeddings:
-    global _embeddings
-    if _embeddings is None:
-        logger.info(f"Loading embedding model: {settings.embedding_model}")
-        _embeddings = HuggingFaceEmbeddings(
-            model_name=settings.embedding_model,
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-    return _embeddings
-
-
-def get_vector_store() -> Optional[FAISS]:
-    """Load the FAISS index from disk, or return None if not yet created."""
-    global _vector_store
-    index_path = Path(settings.faiss_index_path)
-    if _vector_store is None and index_path.exists() and any(index_path.iterdir()):
-        logger.info("Loading existing FAISS index from disk...")
-        _vector_store = FAISS.load_local(
-            str(index_path),
-            _get_embeddings(),
-            allow_dangerous_deserialization=True,
-        )
-    return _vector_store
+# ── Ingestion Core ────────────────────────────────────────────────────────────
+_vector_store = get_vector_store()
 
 
 def _extract_text(file_bytes: bytes, filename: str) -> str:
@@ -98,16 +72,18 @@ def ingest_document(file_bytes: bytes, filename: str) -> int:
     logger.info(f"Saved raw text copy to {raw_docs_dir / f'{filename}.txt'}")
 
     # 3 & 4. Embed + Index
-    embeddings = _get_embeddings()
+    embeddings = get_embeddings()
     index_path = settings.faiss_index_path
     Path(index_path).mkdir(parents=True, exist_ok=True)
-
+    
+    _vector_store = get_vector_store()
     if _vector_store is None:
         _vector_store = FAISS.from_documents(chunks, embeddings)
     else:
         _vector_store.add_documents(chunks)
 
     _vector_store.save_local(index_path)
+    set_vector_store(_vector_store)
     logger.success(f"FAISS index saved. Total chunks this session: {len(chunks)}")
 
     # 5. Invalidate Response Cache (Knowledge changed)
