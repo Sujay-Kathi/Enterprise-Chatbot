@@ -1,13 +1,11 @@
 # ============================================================
 # Enterprise RAG Chatbot - Combined Requirements
-# REQUIRED: Python 3.11+
+# Python 3.12 (Vercel compatible)
 # ============================================================
- 
+
 # --- Core Frameworks ---
 fastapi==0.111.0
 uvicorn[standard]==0.30.1
-streamlit==1.36.0
-streamlit-cookies-controller==0.0.2
 
 # --- Request/Response Validation ---
 pydantic==2.7.1
@@ -35,7 +33,7 @@ langchain-text-splitters>=0.2.2
 # --- Embeddings & Vector Store ---
 sentence-transformers==3.0.0
 faiss-cpu==1.8.0
-huggingface-hub==0.23.4
+huggingface-hub>=0.23.4
 
 # --- Document Parsing ---
 pypdf==4.2.0
