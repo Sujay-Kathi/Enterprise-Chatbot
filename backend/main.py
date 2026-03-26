@@ -46,7 +46,7 @@ async def health_check():
 async def startup_event():
     """Ensure data directories exist on startup."""
     import os
-    os.makedirs("./data/faiss_index", exist_ok=True)
+    os.makedirs(settings.faiss_index_path, exist_ok=True)
     logger.info("🎬 FastAPI server starting up...")
     logger.info(f"📍 FAISS index located at: {settings.faiss_index_path}")
 

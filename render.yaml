@@ -1,0 +1,63 @@
+services:
+  - type: web
+    name: enterprise-rag-chatbot-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+
+    # --- Health Check ---
+    healthCheckPath: /
+
+    # --- Environment Variables ---
+    envVars:
+      - key: NVIDIA_API_KEY
+        sync: false          # Set manually in Render Dashboard
+
+      - key: JWT_SECRET_KEY
+        generateValue: true  # Render auto-generates a secure random value
+
+      - key: JWT_ALGORITHM
+        value: HS256
+
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+
+      - key: SMTP_PORT
+        value: "587"
+
+      - key: SMTP_USER
+        sync: false          # Set manually in Render Dashboard
+
+      - key: SMTP_PASSWORD
+        sync: false          # Set manually in Render Dashboard
+
+      - key: OTP_EXPIRE_MINUTES
+        value: "10"
+
+      - key: BACKEND_HOST
+        value: 0.0.0.0
+
+      - key: BACKEND_PORT
+        value: "8000"
+
+      - key: CORS_ORIGINS
+        value: "*"           # Update to your frontend URL after deploy
+
+      - key: FAISS_INDEX_PATH
+        value: /data/faiss_index
+
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+
+      - key: NIM_MODEL
+        value: meta/llama-3.1-8b-instruct
+
+    # --- Persistent Disk (for FAISS index) ---
+    disk:
+      name: faiss-data
+      mountPath: /data
+      sizeGB: 1

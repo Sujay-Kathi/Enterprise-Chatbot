@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local data (FAISS index will be mounted on Render)
+data/
+
+# Frontend (deployed separately)
+frontend/
+
+# Dev / CI
+.env
+.git
+.gitignore
+.agent/
+docs/
+scripts/
+*.md
+docker-compose.yml
+Procfile
+api/
+
+# IDE
+.vscode/
+.idea/
