@@ -61,3 +61,21 @@ services:
       name: faiss-data
       mountPath: /data
       sizeGB: 1
+
+  # ──────────────────────────────────────────────────────────
+  # FRONTEND: Streamlit UI
+  # ──────────────────────────────────────────────────────────
+  - type: web
+    name: enterprise-rag-chatbot-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: .
+    plan: free
+
+    # --- Health Check ---
+    healthCheckPath: /
+
+    # --- Environment Variables ---
+    envVars:
+      - key: BACKEND_URL
+        value: https://enterprise-rag-chatbot-backend.onrender.com  # Update after backend deploys
