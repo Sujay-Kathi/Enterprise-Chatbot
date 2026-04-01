@@ -69,7 +69,7 @@ services:
     name: enterprise-rag-chatbot-frontend
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
+    dockerContext: .
     plan: free
 
     # --- Health Check ---

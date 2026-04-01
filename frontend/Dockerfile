@@ -5,11 +5,11 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Copy only frontend requirements (lean — no backend deps)
-COPY requirements.txt .
+COPY frontend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Streamlit app code
-COPY app.py .
+COPY frontend/app.py .
 
 # Expose Streamlit port
 EXPOSE 8501

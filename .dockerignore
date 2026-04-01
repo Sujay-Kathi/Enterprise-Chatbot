@@ -16,8 +16,6 @@ env/
 # Local data (FAISS index will be mounted on Render)
 data/
 
-# Frontend (deployed separately)
-frontend/
 
 # Dev / CI
 .env
