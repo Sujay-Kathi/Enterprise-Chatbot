@@ -209,7 +209,13 @@ def api_upload_file(file_obj, token: str) -> bool:
     headers = {"Authorization": f"Bearer {token}"}
     files = {"file": (file_obj.name, file_obj.getvalue(), file_obj.type)}
     try:
-        resp = requests.post(f"{BACKEND_URL}/documents/upload", headers=headers, files=files)
+        # Long timeout: first upload triggers embedding model download (~90MB, 30-60s on Render)
+        resp = requests.post(
+            f"{BACKEND_URL}/documents/upload",
+            headers=headers,
+            files=files,
+            timeout=300
+        )
         return resp.status_code == 201
     except Exception as e:
         logger.error(f"File upload failed: {e}")

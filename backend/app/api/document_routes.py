@@ -3,6 +3,8 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from loguru import logger
 from typing import List
+import asyncio
+from functools import partial
 
 from app.core import dependencies
 from app.services import ingestion_service, cache_service
@@ -30,7 +32,13 @@ async def upload_document(
 
     try:
         content = await file.read()
-        num_chunks = ingestion_service.ingest_document(content, filename)
+        # Run blocking ingestion (embedding + FAISS) in a thread pool
+        # to avoid blocking the async event loop and causing premature disconnects
+        loop = asyncio.get_event_loop()
+        num_chunks = await loop.run_in_executor(
+            None,
+            partial(ingestion_service.ingest_document, content, filename)
+        )
         
         return {
             "message": "Document indexed successfully",
